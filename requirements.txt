@@ -1,0 +1,7 @@
+flask
+requests
+pandas
+beautifulsoup4
+fake-useragent
+python-dotenv
+flask-limiter

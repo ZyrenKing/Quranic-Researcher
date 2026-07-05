@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الباحث القراني</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;700&family=IBM+Plex+Sans:wght@400;700&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <div class="container">
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="flash-messages-container">
+            {% for category, message in messages %}
+            <!-- نستخدم المتغير category مباشرة لتحديد لون النص ولون الخلفية ولون الحدود -->
+            <div class="flash-box"
+                style="color: {{ category }}; border-color: {{ category }}; background-color: {{ category }}15;">
+                • {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+
+        <h1 class="title main-title">الباحث القراني</h1>
+
+        <form action="{{ url_for('search') }}" method="post" class="search-form">
+            <div class="form-row">
+
+                <div class="input-group">
+                    <p>ادخل اسم السورة</p>
+                    <select id="sora_name" name="sora_name">
+                        {% for option in options %}
+                        <option value="{{ option }}" {% if result and result.sora_name==option %}selected{% endif %}>{{
+                            option }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <p>ادخل رقم الاية</p>
+                    <input type="text" name="aya_num" placeholder="ادخل رقم الاية"
+                        value="{{ result.aya_num if result else '' }}" required>
+                </div>
+
+                <button type="submit" class="btn_my btn-primary">جلب</button>
+            </div>
+        </form>
+
+        <h1 class="title section-title">الآية الكريمة بالرسم العثماني</h1>
+        <div class="text-box" id="aya">{{ result.aya_text if result else 'هنا يظهر نص الآية الكريمة موسطاً تماماً من كل
+            الاتجاهات.' }}
+        </div>
+        <button class="btn_my btn-copy" id="btn-copy-aya" onclick="copyText_aya()">نسخ الآية</button>
+
+        <h1 class="title section-title">تفسير الشيخ السعدي | رحمه الله</h1>
+        <div class="text-box" id="tafsir">{{ result.tafsir_text if result else 'هنا يظهر تفسير الآية الكريمة موسطاً
+            تماماً من كل الاتجاهات.' }}</div>
+        <button class="btn_my btn-copy" id="btn-copy-tafsir" onclick="copyText_tafsir()">نسخ التفسير</button>
+
+        <h1 class="title section-title">تلاوة الآية الكريمة</h1>
+        <div class="audio-section-box">
+            <p class="audio-label">بصوت الشيخ ماهر المعيقلي</p>
+            {% if result and result.aya_sound %}
+            <audio id="player" controls="controls" src="{{ result.aya_sound }}">
+                متصفحك لا يدعم تشغيل الصوت.
+            </audio>
+            {% else %}
+            <audio id="player" controls="controls" src="#">
+                متصفحك لا يدعم تشغيل الصوت.
+            </audio>
+            {% endif %}
+        </div>
+
+        <h1 class="title section-title">صورة الآية</h1>
+        <div class="image-section-box">
+            {% if result and result.aya_image %}
+            <img id="aya-img" src="{{ result.aya_image }}" alt="صورة الآية الكريمة">
+            {% else %}
+            <img id="aya-img" src="{{ url_for('static', filename='uploads/default_aya.png') }}"
+                alt="صورة الآية الكريمة">
+            {% endif %}
+        </div>
+
+        <button class="btn_my btn-copy" id="btn-copy-image" onclick="saveImageLocally()">تحميل
+            الصورة</button>
+
+        <div class="actions-section-box">
+            <button type="button" class="btn_my btn-action btn-zip" onclick="CreateZipFile()">
+                <span>📦</span> تنزيل الكل لملف ZIP
+            </button>
+        </div>
+    </div>
+
+    <footer class="main-footer">
+        <div class="footer-content">
+            <p class="footer-copyright">© 2026 الباحث القراني. جميع الحقوق محفوظة.</p>
+
+            <div class="footer-links">
+                <a href="https://github.com/ZyrenKing" target="_blank" class="github-link">
+                    <svg class="github-icon" viewBox="0 0 24 24" width="24" height="24">
+                        <path fill="currentColor"
+                            d="M12 2A10 10 0 0 0 2 12c0 4.42 2.87 8.17 6.84 9.5.5.08.66-.23.66-.5v-1.69c-2.77.6-3.36-1.34-3.36-1.34-.46-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.87 1.52 2.34 1.07 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.92 0-1.11.38-2 1.03-2.71-.1-.25-.45-1.29.1-2.64 0 0 .84-.27 2.75 1.02.79-.22 1.65-.33 2.5-.33.85 0 1.71.11 2.5.33 1.91-1.29 2.75-1.02 2.75-1.02.55 1.35.2 2.39.1 2.64.65.71 1.03 1.6 1.03 2.71 0 3.82-2.34 4.66-4.57 4.91.36.31.69.92.69 1.85V21c0 .27.16.59.67.5C19.14 20.16 22 16.42 22 12A10 10 0 0 0 12 2z">
+                        </path>
+                    </svg>
+                    <span>حسابي على GitHub</span>
+                </a>
+
+                <div class="content-row">
+                    <a href="https://www.facebook.com/razi.ahmed.5806/" target="_blank">
+                        <i class="fa-brands fa-facebook icon"></i>
+                    </a>
+                    <a href="https://wa.me/0945691189" target="_blank">
+                        <i class="fa-brands fa-whatsapp icon"></i>
+                    </a>
+                    <a href="https://discord.com/users/1261309489601056848" target="_blank">
+                        <i class="fa-brands fa-discord icon"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/jszip.min.js') }}"></script>
+</body>
+
+</html>
