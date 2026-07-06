@@ -22,8 +22,20 @@ Before starting, ensure that the following is installed on your device:
 - `pip` for manage the Moduls
 ---
 ## Installation & Setup 💻
-clone this is repo:
-```ruby
-git clone [رابط المستودع الخاص بك]
-cd [اسم المجلد]
+1. clone this is repo:
+```Bash
+git clone https://github.com/ZyrenKing/Quranic-Researcher
+```
+2. Create and activate a virtual environment:
+```Bash
+python -m venv venv
+source venv/bin/activate  # on the Linux/macOS
+```
+3. Installs the required libraries:
+```Bash
+pip install -r requirements.txt
+```
+4. Project Operation:
+```Bash
+python app.py
 ```
